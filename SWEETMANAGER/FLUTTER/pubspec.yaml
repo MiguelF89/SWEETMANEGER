@@ -30,11 +30,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  http: ^1.6.0
+  http: ^1.6.0 # Já existe
+  
+  # NOVAS DEPENDÊNCIAS RECOMENDADAS
+  shared_preferences: ^2.2.3 # Para armazenar dados simples (ex: tema, configurações  )
+  flutter_secure_storage: ^9.0.0 # ESSENCIAL: Para armazenar o token de autenticação de forma segura
+  provider: ^6.1.2 # OU outro gerenciador de estado (bloc, riverpod, getx) para gerenciar o estado da aplicação e autenticação.
+  
 
 dev_dependencies:
   flutter_test:
