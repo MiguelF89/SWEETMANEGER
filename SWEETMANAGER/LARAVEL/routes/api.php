@@ -6,6 +6,7 @@ use App\Http\Controllers\InstituicaoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\AuthApiController;
+use App\Http\Controllers\API\InstituicaoApiController;
 
 Route::post('/login', [AuthApiController::class, 'login']);
 
@@ -14,13 +15,13 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    // Rotas de CRUD para Instituições
-    Route::apiResource('instituicoes', InstituicaoController::class);
 
-    // Rotas de CRUD para Produtos
+    Route::apiResource('instituicoes', InstituicaoApiController::class);
+
+
     Route::apiResource('produtos', ProdutoController::class);
 
-    // Rotas de CRUD para Vendas
+
     Route::apiResource('vendas', VendaController::class);
     
 });

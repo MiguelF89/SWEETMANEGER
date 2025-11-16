@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'modules/auth/pages/login_page.dart';
-import 'modules/dashboard/home_page.dart'; // exemplo
+
+import 'package:sweetmanager_app/modules/auth/pages/login_page.dart';
+import 'package:sweetmanager_app/modules/dashboard/home_page.dart';
+import 'package:sweetmanager_app/modules/instituicoes/instituicoes_page.dart';
+import 'package:sweetmanager_app/modules/produtos/produtos_page.dart';
+import 'package:sweetmanager_app/modules/vendas/vendas_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +21,9 @@ class MyApp extends StatelessWidget {
       routes: {
         "/login": (context) => const LoginPage(),
         "/dashboard": (context) => const HomePage(),
+        "/instituicoes": (context) => const InstituicoesPage(),
+        "/produtos": (context) => const ProdutosPage(),
+        "/vendas": (context) => const VendasPage(),
       },
     );
   }
