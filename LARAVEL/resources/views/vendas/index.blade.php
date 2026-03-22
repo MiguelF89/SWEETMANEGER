@@ -1,0 +1,67 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Vendas') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <div class="mb-4">
+                        <a href="{{ route('vendas.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Criar Venda
+                        </a>
+                    </div>
+
+                    @if (session('success'))
+                        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="border border-gray-300 px-4 py-2">ID</th>
+                                <th class="border border-gray-300 px-4 py-2">Instituição</th>
+                                <th class="border border-gray-300 px-4 py-2">Produto</th>
+                                <th class="border border-gray-300 px-4 py-2">Quantidade</th>
+                                <th class="border border-gray-300 px-4 py-2">Valor Total</th>
+                                <th class="border border-gray-300 px-4 py-2">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($vendas as $venda)
+                                <tr>
+                                    <td class="border border-gray-300 px-4 py-2">{{ $venda->id }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">{{ $venda->instituicao->nome }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">{{ $venda->produto->nome }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">{{ $venda->quantidade }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        <a href="{{ route('vendas.edit', $venda->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded text-sm">
+                                            Editar
+                                        </a>
+                                        <form action="{{ route('vendas.destroy', $venda->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm" onclick="return confirm('Tem certeza?')">
+                                                Deletar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <div class="mt-4">
+                        {{ $vendas->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
