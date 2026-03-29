@@ -12,14 +12,14 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_DATABASE=laravel
       - DB_USERNAME=root
       - DB_PASSWORD=root
+    restart: on-failure
 
   mysql:
     image: mysql:8.0
@@ -32,11 +32,6 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -48,8 +43,7 @@ services:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: root
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
 
 volumes:
   mysql_data:
