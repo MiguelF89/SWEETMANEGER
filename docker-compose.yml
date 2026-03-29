@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   app:
-    image: php:8.3-cli
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: laravel_app
     working_dir: /var/www
     volumes:
@@ -10,14 +12,14 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - mysql
-    command: >
-      sh -c "
-      apt update &&
-      apt install -y unzip git curl libzip-dev zip libxml2-dev nodejs npm &&
-      docker-php-ext-install pdo pdo_mysql xml &&
-      php artisan serve --host=0.0.0.0 --port=8000
-      "
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
 
   mysql:
     image: mysql:8.0
@@ -28,6 +30,13 @@ services:
       MYSQL_DATABASE: laravel
     ports:
       - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -38,3 +47,9 @@ services:
     environment:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
