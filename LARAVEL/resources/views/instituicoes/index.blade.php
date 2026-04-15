@@ -36,8 +36,9 @@
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2">{{ $instituicao->id }}</td>
                                     <td class="border border-gray-300 px-4 py-2">{{ $instituicao->nome }}</td>
-                                    <td class="border border-gray-300 px-4 py-2">{{ $instituicao->contato }}</td>
-                                    <td class="border border-gray-300 px-4 py-2">{{ $instituicao->cnpj }}</td>
+                                    {{-- Exibe formatado usando os accessors do model --}}
+                                    <td class="border border-gray-300 px-4 py-2">{{ $instituicao->contato_formatted }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">{{ $instituicao->cnpj_formatted }}</td>
                                     <td class="border border-gray-300 px-4 py-2">
                                         <a href="{{ route('instituicoes.edit', $instituicao->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded text-sm">
                                             Editar

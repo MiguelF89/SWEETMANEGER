@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\BrasilHelper;
 use App\Models\Instituicao;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -10,7 +11,6 @@ class InstituicaoController extends Controller
 {
     public function index()
     {
-        // Global scope já filtra por user_id automaticamente
         $instituicoes = Instituicao::paginate(10);
         return view('instituicoes.index', compact('instituicoes'));
     }
@@ -24,8 +24,16 @@ class InstituicaoController extends Controller
     {
         $validated = $request->validate([
             'nome'    => 'required|string',
-            'contato' => 'required|string',
-            'cnpj'    => 'required|string',
+            'contato' => ['required', 'string', function ($attr, $value, $fail) {
+                if (!BrasilHelper::validatePhone($value)) {
+                    $fail('O contato deve ser um telefone brasileiro válido (10 ou 11 dígitos).');
+                }
+            }],
+            'cnpj'    => ['required', 'string', function ($attr, $value, $fail) {
+                if (!BrasilHelper::validateCnpj($value)) {
+                    $fail('O CNPJ informado é inválido.');
+                }
+            }],
         ]);
 
         Instituicao::create($validated);
@@ -42,8 +50,16 @@ class InstituicaoController extends Controller
     {
         $validated = $request->validate([
             'nome'    => 'required|string',
-            'contato' => 'required|string',
-            'cnpj'    => 'required|string',
+            'contato' => ['required', 'string', function ($attr, $value, $fail) {
+                if (!BrasilHelper::validatePhone($value)) {
+                    $fail('O contato deve ser um telefone brasileiro válido (10 ou 11 dígitos).');
+                }
+            }],
+            'cnpj'    => ['required', 'string', function ($attr, $value, $fail) {
+                if (!BrasilHelper::validateCnpj($value)) {
+                    $fail('O CNPJ informado é inválido.');
+                }
+            }],
         ]);
 
         $instituicao->update($validated);
