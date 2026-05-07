@@ -1,14 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+            Painel
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Botões de Ação Rápida -->
-            <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
                 <a href="{{ route('instituicoes.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded text-center">
                     Criar Instituição
                 </a>
@@ -17,6 +15,9 @@
                 </a>
                 <a href="{{ route('vendas.create') }}" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded text-center">
                     Criar Venda
+                </a>
+                <a href="{{ route('boleto.reader') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded text-center">
+                    📄 Ler Boleto
                 </a>
             </div>
 

@@ -88,7 +88,7 @@ class BoletoReaderService
         }
 
         // Try Imagick PHP extension
-        if (extension_loaded('imagick')) {
+        if (extension_loaded('imagick') && class_exists('Imagick')) {
             $imagick = new \Imagick();
             $imagick->setResolution(200, 200);
             $imagick->readImage($pdfPath . '[0]'); // first page only

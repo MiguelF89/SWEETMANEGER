@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InstituicaoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\VendaController;
+use App\Http\Controllers\BoletoController;
 
 
 
@@ -24,4 +25,7 @@ Route::middleware([
     ]);
     Route::resource('produtos', ProdutoController::class);
     Route::resource('vendas', VendaController::class);
+
+    // ── Boleto Reader ────────────────────────────────────────
+    Route::get('/boleto/reader', [BoletoController::class, 'reader'])->name('boleto.reader');
 });
