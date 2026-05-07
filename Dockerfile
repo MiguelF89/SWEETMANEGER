@@ -4,7 +4,13 @@ FROM php:8.3-cli
 RUN apt-get update && apt-get install -y \
     unzip git curl libzip-dev zip libxml2-dev nodejs npm \
     default-mysql-client \
-    && docker-php-ext-install pdo pdo_mysql xml zip \
+    zbar-tools tesseract-ocr tesseract-ocr-por ghostscript \
+    libmagickwand-dev \
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql xml zip gd \
+    && docker-php-ext-enable gd \
+    && pecl install imagick && docker-php-ext-enable imagick \
     && apt-get clean
 
 # Instala o Composer
