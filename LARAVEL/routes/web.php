@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EncomendaController;
 use App\Http\Controllers\InstituicaoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\VendaController;
@@ -25,6 +26,7 @@ Route::middleware([
     ]);
     Route::resource('produtos', ProdutoController::class);
     Route::resource('vendas', VendaController::class);
+    Route::resource('encomendas', EncomendaController::class);
 
     // ── Boleto Reader ────────────────────────────────────────
     Route::get('/boleto/reader', [BoletoController::class, 'reader'])->name('boleto.reader');

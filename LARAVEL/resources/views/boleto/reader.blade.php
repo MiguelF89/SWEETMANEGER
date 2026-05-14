@@ -115,6 +115,7 @@
             width: 100%;
             justify-content: center;
         }
+        .btn-inline { width: auto; }
         .btn:disabled { opacity: .5; cursor: not-allowed; }
         .btn-primary { background: #4f46e5; color: #fff; }
         .btn-primary:hover:not(:disabled) { background: #4338ca; }
@@ -174,6 +175,7 @@
 <div class="card">
     <h1>📄 Leitor de Boleto</h1>
     <p class="sub">Escaneie ou envie um boleto para extrair os dados automaticamente.</p>
+    <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-inline" style="margin-bottom:1rem;">← Voltar ao Painel</a>
 
     <!-- Source tabs -->
     <div class="tabs">
