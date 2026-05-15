@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Leitor de Boleto — SweetManager</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,6 +30,8 @@
 
         h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: .25rem; }
         p.sub { color: #666; font-size: .9rem; margin-bottom: 1.5rem; }
+
+        .top-actions { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
 
         /* Tabs */
         .tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
@@ -100,6 +103,18 @@
             display: none;
         }
 
+        /* Descrição */
+        .descricao-input {
+            width: 100%;
+            padding: .5rem .75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: .9rem;
+            margin-bottom: .75rem;
+            color: #1a1a1a;
+        }
+        .descricao-input:focus { outline: none; border-color: #4f46e5; }
+
         /* Buttons */
         .btn {
             display: inline-flex;
@@ -114,6 +129,7 @@
             transition: opacity .15s;
             width: 100%;
             justify-content: center;
+            text-decoration: none;
         }
         .btn-inline { width: auto; }
         .btn:disabled { opacity: .5; cursor: not-allowed; }
@@ -121,6 +137,8 @@
         .btn-primary:hover:not(:disabled) { background: #4338ca; }
         .btn-secondary { background: #e5e7eb; color: #374151; margin-bottom: .5rem; }
         .btn-secondary:hover:not(:disabled) { background: #d1d5db; }
+        .btn-success { background: #16a34a; color: #fff; }
+        .btn-success:hover:not(:disabled) { background: #15803d; }
 
         /* Result */
         #result { margin-top: 1.5rem; }
@@ -159,6 +177,8 @@
         }
         .barcode-field value { font-size: .78rem; font-family: monospace; font-weight: 500; }
 
+        .result-actions { display: flex; gap: .5rem; margin-top: 1rem; }
+
         /* Spinner */
         .spinner {
             width: 18px; height: 18px;
@@ -173,9 +193,14 @@
 </head>
 <body>
 <div class="card">
-    <h1>📄 Leitor de Boleto</h1>
-    <p class="sub">Escaneie ou envie um boleto para extrair os dados automaticamente.</p>
-    <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-inline" style="margin-bottom:1rem;">← Voltar ao Painel</a>
+    <h1>Leitor de Boleto</h1>
+    <p class="sub">Escaneie ou envie um boleto — ele será salvo automaticamente na lista de pagamentos.</p>
+
+    <div class="top-actions">
+        <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-inline">← Painel</a>
+        <a href="{{ route('boleto.index') }}" class="btn btn-secondary btn-inline">📋 Lista de Boletos</a>
+        <a href="{{ route('relatorio.index') }}" class="btn btn-secondary btn-inline">📊 Relatório</a>
+    </div>
 
     <!-- Source tabs -->
     <div class="tabs">
@@ -183,6 +208,15 @@
         <button class="tab" data-tab="image">🖼️ Imagem</button>
         <button class="tab" data-tab="pdf">📄 PDF</button>
     </div>
+
+    <!-- Descrição opcional -->
+    <input
+        type="text"
+        class="descricao-input"
+        id="descricao"
+        placeholder="Descrição do boleto (opcional, ex: Fornecedor X, Aluguel...)"
+        maxlength="255"
+    />
 
     <!-- ─── Camera panel ─────────────────────────── -->
     <div id="panel-camera" class="panel active">
@@ -229,10 +263,9 @@
 </div>
 
 <script>
-// ─── Configuration ──────────────────────────────────────────
-// Replace with your actual API URL and auth token
-const API_URL   = '/api/boleto/read';
-const API_TOKEN = localStorage.getItem('api_token') || '';
+// ─── CSRF Token ──────────────────────────────────────────────
+const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+const API_URL    = '{{ route("boleto.read") }}';
 
 // ─── Tabs ────────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(tab => {
@@ -250,7 +283,6 @@ const video      = document.getElementById('video');
 const snapshot   = document.getElementById('snapshot');
 const btnStart   = document.getElementById('btnStartCamera');
 const btnCapture = document.getElementById('btnCapture');
-
 let stream = null;
 
 btnStart.addEventListener('click', async () => {
@@ -271,7 +303,6 @@ btnCapture.addEventListener('click', async () => {
     snapshot.width  = video.videoWidth;
     snapshot.height = video.videoHeight;
     snapshot.getContext('2d').drawImage(video, 0, 0);
-
     snapshot.toBlob(async blob => {
         await sendFile(blob, 'capture.jpg', 'image/jpeg', btnCapture);
     }, 'image/jpeg', 0.92);
@@ -335,6 +366,9 @@ async function sendFile(blob, filename, mimeType, triggerBtn) {
     const form = new FormData();
     form.append('file', blob, filename);
 
+    const desc = document.getElementById('descricao').value.trim();
+    if (desc) form.append('descricao', desc);
+
     setLoading(triggerBtn, true);
     hideResult();
 
@@ -342,9 +376,9 @@ async function sendFile(blob, filename, mimeType, triggerBtn) {
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + API_TOKEN,
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
             },
             body: form,
         });
@@ -352,7 +386,7 @@ async function sendFile(blob, filename, mimeType, triggerBtn) {
         const json = await res.json();
 
         if (json.success) {
-            showResult(json.data);
+            showResult(json.data, json.message);
         } else {
             showError(json.error || 'Erro desconhecido ao processar o boleto.');
         }
@@ -364,16 +398,16 @@ async function sendFile(blob, filename, mimeType, triggerBtn) {
 }
 
 // ─── UI helpers ───────────────────────────────────────────────
-function showResult(data) {
+function showResult(data, message) {
     const result = document.getElementById('result');
-    const amount   = data.amount   != null ? 'R$ ' + data.amount.toFixed(2).replace('.', ',') : '—';
-    const dueDate  = data.due_date != null ? formatDate(data.due_date) : '—';
-    const bank     = data.bank     || '—';
+    const amount  = data.amount   != null ? 'R$ ' + data.amount.toFixed(2).replace('.', ',') : '—';
+    const dueDate = data.due_date != null ? formatDate(data.due_date) : '—';
+    const bank    = data.bank     || '—';
 
     result.className = '';
     result.innerHTML = `
         <div class="result-card">
-            <h2>✅ Boleto lido com sucesso</h2>
+            <h2>✅ ${message || 'Boleto lido com sucesso'}</h2>
             <div class="field">
                 <label>Valor</label>
                 <value>${amount}</value>
@@ -393,6 +427,10 @@ function showResult(data) {
             <div class="field barcode-field">
                 <label>Código de barras</label>
                 <value>${data.barcode || '—'}</value>
+            </div>
+            <div class="result-actions">
+                <a href="{{ route('boleto.index') }}" class="btn btn-success btn-inline">📋 Ver lista de boletos</a>
+                <button class="btn btn-secondary btn-inline" onclick="hideResult()">Ler outro</button>
             </div>
         </div>`;
 }
